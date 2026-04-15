@@ -48,12 +48,24 @@ export async function isSessionValid(): Promise<boolean> {
 
 export async function getAccessToken(): Promise<string | null> {
   const session = await getSession()
-  return session?.accessToken ?? null
+  if (session?.accessToken) {
+    return session.accessToken
+  }
+  
+  return process.env.THREADS_ACCESS_TOKEN ?? null
 }
 
 export async function getUserId(): Promise<string | null> {
   const session = await getSession()
-  return session?.userId ?? null
+  if (session?.userId) {
+    return session.userId
+  }
+  
+  if (process.env.THREADS_ACCESS_TOKEN) {
+    return 'test-user'
+  }
+  
+  return null
 }
 
 export async function needsRefresh(): Promise<boolean> {
