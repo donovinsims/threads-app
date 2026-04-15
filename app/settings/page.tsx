@@ -72,7 +72,7 @@ function ThemeToggle() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
           </svg>
         ) : (
-          <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-link" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
           </svg>
         )}
@@ -126,16 +126,13 @@ function ConnectedAccount({
     <Card>
       <CardContent className="p-4">
         {needsRefresh && (
-          <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+          <div className="mb-4 p-3 bg-surface-2 rounded-xl border border-border-1">
+            <p className="text-[13px] text-text-1">
               Your session is expiring {expiresIn ? `in ${formatExpiry(expiresIn)}` : 'soon'}.
-              Please reconnect to continue scheduling posts.
+              Please reconnect to continue.
             </p>
-            <button
-              onClick={handleReconnect}
-              className="mt-2 text-sm font-medium text-yellow-700 dark:text-yellow-300 hover:underline"
-            >
-              Reconnect Now
+            <button onClick={handleReconnect} className="mt-2 text-[13px] font-semibold text-link">
+              Reconnect Now →
             </button>
           </div>
         )}
@@ -149,7 +146,7 @@ function ConnectedAccount({
             <p className="font-medium text-text-0">{userName || 'Connected'}</p>
             <p className="text-sm text-text-1">Threads Account</p>
           </div>
-          <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 rounded-full">
+          <span className="px-2.5 py-1 text-[11px] font-semibold bg-link/10 text-link rounded-full">
             Connected
           </span>
         </div>
@@ -352,8 +349,8 @@ function SettingsContent() {
           connectionStatus.error && (
             <Card>
               <CardContent className="p-4">
-                <div className="p-3 bg-red-50 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-800">
-                  <p className="text-sm text-red-800 dark:text-red-200 mb-2">
+                <div className="p-3 bg-surface-2 rounded-xl border border-border-1">
+                  <p className="text-[13px] text-red-500 mb-2">
                     Connection Error: {connectionStatus.error}
                   </p>
                   <Button
@@ -385,12 +382,12 @@ function SettingsContent() {
           <ListRow
             label="Server Status"
             value="Online"
-            valueClassName="text-green-600 dark:text-green-400"
+            valueClassName="text-link"
           />
           <ListRow
             label="API Status"
             value="Ready"
-            valueClassName="text-green-600 dark:text-green-400"
+            valueClassName="text-link"
           />
           <ListRow
             label="Cron Jobs"

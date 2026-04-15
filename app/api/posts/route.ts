@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import * as serverStorage from '@/lib/server-storage'
-import type { Post } from '@/types/post'
+import type { Post, Media } from '@/types/post'
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json()
-    const { content, scheduledAt } = body
+    const { content, media, scheduledAt } = body
 
     if (!content || typeof content !== 'string') {
       return NextResponse.json(
@@ -35,9 +35,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    const input: { content: string; scheduledAt?: Date } = { content }
+    const input: { content: string; media?: Media[]; scheduledAt?: Date } = { content }
     if (scheduledAt) {
       input.scheduledAt = new Date(scheduledAt)
+    }
+    if (media && Array.isArray(media)) {
+      input.media = media
     }
 
     const post = await serverStorage.serverCreate(input)
@@ -63,10 +66,11 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json()
-    const { content, scheduledAt, status } = body
+    const { content, media, scheduledAt, status } = body
 
     const input: Record<string, unknown> = {}
     if (content !== undefined) input.content = content
+    if (media !== undefined) input.media = media
     if (scheduledAt !== undefined) input.scheduledAt = new Date(scheduledAt)
     if (status !== undefined) input.status = status
 

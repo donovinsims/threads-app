@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { PageShell, PageHeader } from '@/components/PageShell'
 import { Card, CardContent } from '@/components/ui/Card'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
+import { PostDetailSheet } from '@/components/ui/PostDetailSheet'
 import { formatScheduledTime, formatFullDate } from '@/lib/mock-data'
 import type { Post, PostStatus } from '@/types/post'
 
@@ -18,19 +19,19 @@ const filterOptions = [
   { value: 'failed', label: 'Failed' },
 ]
 
-const statusConfig: Record<PostStatus, { bg: string; text: string; label: string }> = {
-  scheduled: { bg: 'bg-[#e0f0ff] dark:bg-[#1a2a3a]', text: 'text-[#0066cc] dark:text-[#4da3ff]', label: 'Scheduled' },
-  draft: { bg: 'bg-surface-2', text: 'text-text-1', label: 'Draft' },
-  publishing: { bg: 'bg-[#fff8e0] dark:bg-[#3a2a1a]', text: 'text-[#996600] dark:text-[#ffcc00]', label: 'Publishing' },
-  published: { bg: 'bg-[#e0ffe0] dark:bg-[#1a3a1a]', text: 'text-[#009900] dark:text-[#4dff4d]', label: 'Published' },
-  failed: { bg: 'bg-[#ffe0e0] dark:bg-[#3a1a1a]', text: 'text-[#cc0000] dark:text-[#ff4d4d]', label: 'Failed' },
+const statusConfig: Record<PostStatus, { label: string; className: string }> = {
+  scheduled:  { label: 'Scheduled',  className: 'bg-link/10 text-link' },
+  draft:      { label: 'Draft',      className: 'bg-surface-2 text-text-1 border border-border-1' },
+  publishing: { label: 'Publishing', className: 'bg-surface-2 text-text-0 border border-border-1' },
+  published:  { label: 'Published',  className: 'bg-surface-2 text-text-1 border border-border-1' },
+  failed:     { label: 'Failed',     className: 'bg-surface-2 text-red-500 border border-border-1' },
 }
 
-function PostCard({ post, onRetry }: { post: Post; onRetry?: (id: string) => void }) {
+function PostCard({ post, onClick }: { post: Post; onClick?: () => void }) {
   const status = statusConfig[post.status]
-  
+
   return (
-    <Card interactive className="mb-3">
+    <Card interactive className="mb-3" onClick={onClick}>
       <CardContent className="p-4">
         <div className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-3">
@@ -44,16 +45,16 @@ function PostCard({ post, onRetry }: { post: Post; onRetry?: (id: string) => voi
                 {post.content}
               </p>
               {post.status === 'failed' && post.error && (
-                <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                <p className="text-xs text-red-500 mt-2">
                   {post.error}
                 </p>
               )}
             </div>
-            <span className={`shrink-0 px-2.5 py-1 text-xs font-semibold rounded-full ${status.bg} ${status.text}`}>
+            <span className={`shrink-0 px-2.5 py-1 text-[12px] font-semibold rounded-full ${status.className}`}>
               {status.label}
             </span>
           </div>
-          
+
           <div className="flex items-center gap-4 text-[13px] text-text-1">
             {post.scheduledAt && (
               <div className="flex items-center gap-1.5">
@@ -79,15 +80,6 @@ function PostCard({ post, onRetry }: { post: Post; onRetry?: (id: string) => voi
               </span>
             )}
           </div>
-          
-          {post.status === 'failed' && onRetry && (
-            <button
-              onClick={() => onRetry(post.id)}
-              className="text-sm text-link hover:underline"
-            >
-              Retry
-            </button>
-          )}
         </div>
       </CardContent>
     </Card>
@@ -95,21 +87,26 @@ function PostCard({ post, onRetry }: { post: Post; onRetry?: (id: string) => voi
 }
 
 function EmptyState({ filter }: { filter: FilterStatus }) {
-  const messages: Record<FilterStatus, string> = {
-    all: 'No posts yet. Start composing!',
-    scheduled: 'No scheduled posts. Time to plan ahead.',
-    publishing: 'No posts currently publishing.',
-    draft: 'No drafts. Your ideas await.',
-    published: 'No published posts yet.',
-    failed: 'No failed posts.',
+  const messages: Record<FilterStatus, { title: string; sub: string }> = {
+    all:        { title: 'No posts yet',          sub: 'Write your first thread to get started.' },
+    scheduled:  { title: 'Nothing scheduled',     sub: 'Plan ahead — compose a post and pick a time.' },
+    publishing: { title: 'Nothing publishing',    sub: 'Posts will appear here when going live.' },
+    draft:      { title: 'No drafts saved',       sub: 'Start writing and your draft saves automatically.' },
+    published:  { title: 'No published posts yet', sub: "Posts you've sent will appear here." },
+    failed:     { title: 'No failed posts',       sub: 'All clear.' },
   }
+  const { title, sub } = messages[filter]
 
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 animate-fade-in">
-      <svg className="w-20 h-20 text-text-2 mb-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-      <p className="text-[17px] text-text-1 text-center">{messages[filter]}</p>
+    <div className="flex flex-col items-center justify-center py-24 px-8 animate-fade-in text-center">
+      <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border-1 flex items-center justify-center mb-5">
+        <svg className="w-8 h-8 text-text-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.25}
+            d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+        </svg>
+      </div>
+      <p className="text-[17px] font-semibold text-text-0 mb-1">{title}</p>
+      <p className="text-[14px] text-text-1 max-w-[240px]">{sub}</p>
     </div>
   )
 }
@@ -119,6 +116,7 @@ export default function QueuePage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null)
 
   const fetchPosts = useCallback(async () => {
     setLoading(true)
@@ -155,6 +153,30 @@ export default function QueuePage() {
     }
   }
 
+  const handleUpdate = async (id: string, updates: { content?: string; scheduledAt?: Date }) => {
+    try {
+      const body: Record<string, unknown> = {}
+      if (updates.content) body.content = updates.content
+      if (updates.scheduledAt) body.scheduledAt = updates.scheduledAt.toISOString()
+      await fetch(`/api/posts?id=${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(body),
+      })
+      fetchPosts()
+    } catch (e) {
+      console.error('Update failed:', e)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      await fetch(`/api/posts?id=${id}`, { method: 'DELETE' })
+      fetchPosts()
+    } catch (e) {
+      console.error('Delete failed:', e)
+    }
+  }
+
   const sortedPosts = [...posts].sort((a, b) => {
     if (a.scheduledAt && b.scheduledAt) {
       return a.scheduledAt.getTime() - b.scheduledAt.getTime()
@@ -162,11 +184,13 @@ export default function QueuePage() {
     return b.createdAt.getTime() - a.createdAt.getTime()
   })
 
+  const draftCount = posts.filter(p => p.status === 'draft').length
+
   return (
     <PageShell>
       <PageHeader title="Queue" />
-      
-      <div className="px-4 py-3">
+
+      <div className="px-0">
         <SegmentedControl
           options={filterOptions}
           value={filter}
@@ -174,15 +198,33 @@ export default function QueuePage() {
         />
       </div>
 
-      <div className="px-4 pb-6">
+      <div className="px-4 pb-6 pt-3">
+        {filter === 'all' && draftCount > 0 && (
+          <Card interactive className="mb-4" onClick={() => setFilter('draft')}>
+            <CardContent className="p-4 flex items-center justify-between">
+              <span className="text-[15px] text-text-0">
+                {draftCount} draft{draftCount !== 1 ? 's' : ''} saved
+              </span>
+              <span className="text-[14px] font-semibold text-link">View Drafts →</span>
+            </CardContent>
+          </Card>
+        )}
+
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <span className="text-text-1">Loading...</span>
+          <div className="space-y-3">
+            {[1, 2, 3].map(i => (
+              <Card key={i}>
+                <CardContent className="p-4">
+                  <div className="skeleton h-4 w-3/4 rounded mb-3" />
+                  <div className="skeleton h-3 w-1/2 rounded" />
+                </CardContent>
+              </Card>
+            ))}
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20 px-4">
-            <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
-            <button onClick={fetchPosts} className="text-link hover:underline">
+            <p className="text-red-500 text-[14px] mb-4">{error}</p>
+            <button onClick={fetchPosts} className="text-link text-[14px] hover:underline">
               Retry
             </button>
           </div>
@@ -191,11 +233,24 @@ export default function QueuePage() {
         ) : (
           <div className="space-y-3">
             {sortedPosts.map(post => (
-              <PostCard key={post.id} post={post} onRetry={handleRetry} />
+              <PostCard
+                key={post.id}
+                post={post}
+                onClick={() => setSelectedPost(post)}
+              />
             ))}
           </div>
         )}
       </div>
+
+      <PostDetailSheet
+        post={selectedPost}
+        isOpen={!!selectedPost}
+        onClose={() => setSelectedPost(null)}
+        onUpdate={handleUpdate}
+        onRetry={handleRetry}
+        onDelete={handleDelete}
+      />
     </PageShell>
   )
 }

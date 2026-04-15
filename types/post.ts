@@ -2,9 +2,22 @@
 
 export type PostStatus = 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed'
 
+export type MediaType = 'image' | 'video'
+
+export interface Media {
+  id: string
+  type: MediaType
+  url: string
+  width?: number
+  height?: number
+  duration?: number // video only, in seconds
+  blobPath?: string
+}
+
 export interface Post {
   id: string
   content: string
+  media?: Media[]
   threadOrder?: number
   status: PostStatus
   scheduledAt?: Date
@@ -24,16 +37,19 @@ export interface Draft {
 
 export interface DraftPost {
   content: string
+  media?: Media[]
   threadOrder: number
 }
 
 export interface CreatePostInput {
   content: string
+  media?: Media[]
   scheduledAt?: Date
 }
 
 export interface UpdatePostInput {
   content?: string
+  media?: Media[]
   scheduledAt?: Date
   status?: PostStatus
   threadsPostId?: string

@@ -48,6 +48,7 @@ export async function serverCreate(input: CreatePostInput): Promise<Post> {
   const post: Post = {
     id: crypto.randomUUID(),
     content: input.content,
+    media: input.media,
     status: input.scheduledAt ? 'scheduled' : 'draft',
     scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : undefined,
     createdAt: now,
@@ -68,6 +69,7 @@ export async function serverUpdate(id: string, input: UpdatePostInput): Promise<
   const updated: Post = {
     id: existing.id,
     content: input.content ?? existing.content,
+    media: input.media ?? existing.media,
     status: input.status ?? existing.status,
     scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : existing.scheduledAt,
     publishedAt: existing.publishedAt,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, HTMLAttributes } from 'react'
+import { HTMLAttributes } from 'react'
 
 interface SegmentedControlProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   options: { value: string; label: string }[]
@@ -8,57 +8,32 @@ interface SegmentedControlProps extends Omit<HTMLAttributes<HTMLDivElement>, 'on
   onChange: (value: string) => void
 }
 
-export function SegmentedControl({ 
-  options, 
-  value, 
-  onChange,
-  className = '',
-  ...props 
-}: SegmentedControlProps) {
-  const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({})
-
-  const handleSelect = (optionValue: string, _index: number, event: React.MouseEvent<HTMLButtonElement>) => {
-    const button = event.currentTarget
-    const parent = button.parentElement
-    if (parent) {
-      const buttonRect = button.getBoundingClientRect()
-      const parentRect = parent.getBoundingClientRect()
-      setIndicatorStyle({
-        width: buttonRect.width,
-        transform: `translateX(${buttonRect.left - parentRect.left}px)`,
-      })
-    }
-    onChange(optionValue)
-  }
-
+export function SegmentedControl({ options, value, onChange, className = '', ...props }: SegmentedControlProps) {
   return (
-    <div 
-      className={`
-        relative flex bg-surface-1 rounded-lg p-1
-        ${className}
-      `.trim()}
+    <div
+      className={`flex overflow-x-auto scrollbar-none border-b border-border-0 ${className}`}
       {...props}
     >
-      <div 
-        className="absolute top-1 bottom-1 bg-surface-0 rounded-md shadow-sm transition-all duration-200 ease-out"
-        style={indicatorStyle}
-      />
-      {options.map((option, index) => (
-        <button
-          key={option.value}
-          onClick={(e) => handleSelect(option.value, index, e)}
-          className={`
-            relative z-10 flex-1 py-2 px-3
-            text-[13px] font-semibold rounded-md
-            transition-spring
-            pressable
-            min-h-[36px]
-            ${value === option.value ? 'text-text-0' : 'text-text-1 hover:text-text-0'}
-          `}
-        >
-          {option.label}
-        </button>
-      ))}
+      {options.map((option) => {
+        const isActive = value === option.value
+        return (
+          <button
+            key={option.value}
+            onClick={() => onChange(option.value)}
+            className={`
+              shrink-0 px-4 py-3 text-[14px] font-semibold
+              transition-spring pressable
+              border-b-2 -mb-px
+              ${isActive
+                ? 'text-text-0 border-link'
+                : 'text-text-1 border-transparent hover:text-text-0'
+              }
+            `}
+          >
+            {option.label}
+          </button>
+        )
+      })}
     </div>
   )
 }

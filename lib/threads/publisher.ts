@@ -15,9 +15,23 @@ async function publishToThreads(post: Post): Promise<{ threadsPostId: string }> 
     throw new Error('Not authenticated')
   }
 
-  const containerBody = {
-    media_type: 'TEXT',
+  const hasMedia = post.media && post.media.length > 0
+  const firstMedia = post.media?.[0]
+
+  const containerBody: Record<string, string> = {
     text: post.content.slice(0, 500),
+  }
+
+  if (hasMedia && firstMedia) {
+    if (firstMedia.type === 'image') {
+      containerBody.media_type = 'IMAGE'
+      containerBody.image_url = firstMedia.url
+    } else if (firstMedia.type === 'video') {
+      containerBody.media_type = 'VIDEO'
+      containerBody.video_url = firstMedia.url
+    }
+  } else {
+    containerBody.media_type = 'TEXT'
   }
 
   const containerRes = await fetch(`https://graph.threads.net/v1.0/${session.userId}/threads`, {

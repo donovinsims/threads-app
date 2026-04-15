@@ -8,122 +8,76 @@ interface BottomSheetProps extends HTMLAttributes<HTMLDivElement> {
   title?: string
 }
 
-export function BottomSheet({ 
-  isOpen, 
-  onClose, 
-  title,
-  className = '',
-  children,
-  ...props 
-}: BottomSheetProps) {
-  const sheetRef = useRef<HTMLDivElement>(null)
+export function BottomSheet({ isOpen, onClose, title, className = '', children, ...props }: BottomSheetProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [dragY, setDragY] = useState(0)
   const dragStartY = useRef(0)
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose()
-      }
-    }
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
+    const onEsc = (e: KeyboardEvent) => { if (e.key === 'Escape' && isOpen) onClose() }
+    document.addEventListener('keydown', onEsc)
+    return () => document.removeEventListener('keydown', onEsc)
   }, [isOpen, onClose])
 
-  const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
-    if ('touches' in e && e.touches?.[0]) {
-      dragStartY.current = e.touches[0].clientY
-    } else if ('clientY' in e) {
-      dragStartY.current = e.clientY
-    }
-    setIsDragging(true)
-  }
-
-  const handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
+  const dragStart = (clientY: number) => { dragStartY.current = clientY; setIsDragging(true) }
+  const dragMove = (clientY: number) => {
     if (!isDragging) return
-    let currentY: number | undefined
-    if ('touches' in e && e.touches?.[0]) {
-      currentY = e.touches[0].clientY
-    } else if ('clientY' in e) {
-      currentY = e.clientY
-    }
-    if (currentY === undefined) return
-    const delta = currentY - dragStartY.current
-    if (delta > 0) {
-      setDragY(delta)
-    }
+    const delta = clientY - dragStartY.current
+    if (delta > 0) setDragY(delta)
   }
-
-  const handleDragEnd = () => {
+  const dragEnd = () => {
     setIsDragging(false)
-    if (dragY > 100) {
-      onClose()
-    }
+    if (dragY > 100) onClose()
     setDragY(0)
   }
 
   if (!isOpen) return null
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-end justify-center animate-fade-in"
-      onClick={onClose}
-      {...props}
-    >
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" />
-      
+    <div className="fixed inset-0 z-50 flex items-end justify-center animate-fade-in" onClick={onClose} {...props}>
+      <div className="absolute inset-0 bg-black/50" />
       <div
-        ref={sheetRef}
         className={`
-          relative w-full max-w-lg
-          bg-surface-0 rounded-t-2xl
-          max-h-[85vh] overflow-auto
-          animate-slide-up
+          relative w-full max-w-lg bg-surface-0 border border-border-0
+          rounded-t-3xl max-h-[85vh] overflow-auto animate-slide-up
           ${className}
         `.trim()}
-        style={{ transform: `translateY(${dragY}px)`, transition: isDragging ? 'none' : 'transform 0.3s var(--ease-spring)' }}
+        style={{
+          transform: `translateY(${dragY}px)`,
+          transition: isDragging ? 'none' : 'transform 0.3s var(--ease-spring)',
+        }}
         onClick={(e) => e.stopPropagation()}
-        onMouseDown={handleDragStart}
-        onMouseMove={handleDragMove}
-        onMouseUp={handleDragEnd}
-        onMouseLeave={handleDragEnd}
-        onTouchStart={handleDragStart}
-        onTouchMove={handleDragMove}
-        onTouchEnd={handleDragEnd}
+        onMouseDown={(e) => dragStart(e.clientY)}
+        onMouseMove={(e) => dragMove(e.clientY)}
+        onMouseUp={dragEnd}
+        onMouseLeave={dragEnd}
+        onTouchStart={(e) => dragStart(e.touches[0]?.clientY ?? 0)}
+        onTouchMove={(e) => dragMove(e.touches[0]?.clientY ?? 0)}
+        onTouchEnd={dragEnd}
       >
-        <div className="sticky top-0 bg-surface-0 px-4 pt-3 pb-2 z-10">
-          <div className="w-10 h-1 bg-border-1 rounded-full mx-auto mb-3" />
+        <div className="sticky top-0 bg-surface-0 px-4 pt-3 pb-2 z-10 border-b border-border-2">
+          <div className="w-9 h-1 bg-border-1 rounded-full mx-auto mb-3" />
           {title && (
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-text-0">{title}</h2>
+              <h2 className="text-[17px] font-semibold text-text-0">{title}</h2>
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-1 transition-spring pressable"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-transparent hover:bg-surface-2 transition-spring pressable"
                 aria-label="Close"
               >
-                <svg className="w-5 h-5 text-text-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-text-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           )}
         </div>
-        
-        <div className="px-4 pb-6">
-          {children}
-        </div>
+        <div className="px-4 pb-8 pt-2">{children}</div>
       </div>
     </div>
   )

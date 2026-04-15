@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { Draft, DraftPost } from '@/types/post'
+import type { Draft, DraftPost, Media } from '@/types/post'
 
 const STORAGE_KEY = 'threads-app-draft'
 const DEBOUNCE_MS = 500
@@ -13,7 +13,7 @@ interface UseDraftReturn {
   clearDraft: () => void
   lastSaved: Date | null
   isSaving: boolean
-  updatePost: (index: number, content: string) => void
+  updatePost: (index: number, content: string, media?: Media[]) => void
   addPost: () => void
   removePost: (index: number) => void
 }
@@ -65,11 +65,11 @@ export function useDraft(): UseDraftReturn {
     setLastSaved(null)
   }, [])
 
-  const updatePost = useCallback((index: number, content: string) => {
+  const updatePost = useCallback((index: number, content: string, media?: Media[]) => {
     const currentPosts = draft?.posts || []
     const newPosts = [...currentPosts]
     if (newPosts[index]) {
-      newPosts[index] = { ...newPosts[index], content }
+      newPosts[index] = { ...newPosts[index], content, media: media ?? newPosts[index].media }
       saveDraft(newPosts)
     }
   }, [draft?.posts, saveDraft])

@@ -2,103 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Soft Monochrome Design System ─── */
 :root {
-  color-scheme: light dark;
+  --bg:        #f5f5f5;
+  --surface-0: #ffffff;
+  --surface-1: #fcfcfc;
+  --surface-2: #f7f7f7;
+  --border-0:  #e8e8e8;
+  --border-1:  #ededed;
+  --border-2:  #f2f2f2;
+  --text-0:    #000000;
+  --text-1:    #757575;
+  --text-2:    #cfcfcf;
+  --link:      #0099ff;
 
-  /* Semantic tokens - Light mode */
-  --bg: #ffffff;
-  --surface-0: #fafafa;
-  --surface-1: #f5f5f5;
-  --surface-2: #eeeeee;
-  --text-0: #000000;
-  --text-1: #666666;
-  --text-2: #999999;
-  --border-0: #e0e0e0;
-  --border-1: #d0d0d0;
-  --border-2: #c0c0c0;
-  --link: #0066cc;
-  
-  /* Motion tokens */
-  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-fast: 150ms;
+  /* Motion */
+  --ease-spring:   cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-smooth:   cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:   150ms;
   --duration-normal: 200ms;
-  --duration-slow: 300ms;
-  
-  /* Press scale */
+  --duration-slow:   300ms;
   --press-scale: 0.97;
 }
 
+/* Dark mode — toggled by adding .dark to <html> */
+.dark {
+  --bg:        #0f0f0f;
+  --surface-0: #141414;
+  --surface-1: #1c1c1c;
+  --surface-2: #242424;
+  --border-0:  #212121;
+  --border-1:  #2e2e2e;
+  --border-2:  #262626;
+  --text-0:    #ffffff;
+  --text-1:    #919191;
+  --text-2:    #575757;
+  --link:      #0099ff;
+}
+
+/* System fallback for users who haven't manually toggled */
+@media (prefers-color-scheme: dark) {
+  :root:not(.dark):not(.light) {
+    --bg:        #0f0f0f;
+    --surface-0: #141414;
+    --surface-1: #1c1c1c;
+    --surface-2: #242424;
+    --border-0:  #212121;
+    --border-1:  #2e2e2e;
+    --border-2:  #262626;
+    --text-0:    #ffffff;
+    --text-1:    #919191;
+    --text-2:    #575757;
+    --link:      #0099ff;
+  }
+}
+
+/* ─── Animations ─── */
 @keyframes slide-up {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
-
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-
 @keyframes scale-in {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+@keyframes skeleton-loading {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-.animate-slide-up {
-  animation: slide-up 0.3s var(--ease-spring);
-}
+.animate-slide-up { animation: slide-up  0.3s var(--ease-spring) forwards; }
+.animate-fade-in  { animation: fade-in   0.2s var(--ease-smooth) forwards; }
+.animate-scale-in { animation: scale-in  0.2s var(--ease-spring) forwards; }
 
-.animate-fade-in {
-  animation: fade-in 0.2s var(--ease-smooth);
-}
-
-.animate-scale-in {
-  animation: scale-in 0.2s var(--ease-spring);
-}
-
-/* Spring transition utility */
+/* ─── Utility Classes ─── */
 .transition-spring {
-  transition: transform var(--duration-fast) var(--ease-spring),
-              opacity var(--duration-fast) var(--ease-smooth),
-              background-color var(--duration-fast) var(--ease-smooth),
-              color var(--duration-fast) var(--ease-smooth),
-              border-color var(--duration-fast) var(--ease-smooth);
+  transition:
+    transform         var(--duration-fast) var(--ease-spring),
+    opacity           var(--duration-fast) var(--ease-smooth),
+    background-color  var(--duration-fast) var(--ease-smooth),
+    color             var(--duration-fast) var(--ease-smooth),
+    border-color      var(--duration-fast) var(--ease-smooth);
 }
 
-/* Press state utility */
 .pressable {
   cursor: pointer;
   transition: transform var(--duration-fast) var(--ease-spring);
+  -webkit-tap-highlight-color: transparent;
 }
+.pressable:active { transform: scale(var(--press-scale)); }
 
-.pressable:active {
-  transform: scale(var(--press-scale));
-}
+.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
-/* Disabled state */
-.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Loading skeleton */
 .skeleton {
   background: linear-gradient(
     90deg,
@@ -110,32 +109,7 @@
   animation: skeleton-loading 1.5s ease-in-out infinite;
 }
 
-@keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Semantic tokens - Dark mode */
-    --bg: #000000;
-    --surface-0: #111111;
-    --surface-1: #1a1a1a;
-    --surface-2: #242424;
-    --text-0: #ffffff;
-    --text-1: #a0a0a0;
-    --text-2: #666666;
-    --border-0: #333333;
-    --border-1: #2a2a2a;
-    --border-2: #222222;
-    --link: #4da3ff;
-  }
-}
-
+/* ─── Base Layer ─── */
 @layer base {
   html {
     background-color: var(--bg);
@@ -143,7 +117,6 @@
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
   }
-
   body {
     background-color: var(--bg);
     color: var(--text-0);
@@ -151,14 +124,30 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
-  /* Smooth scroll for iOS */
-  * {
-    scroll-behavior: auto;
-  }
-  
-  /* Prevent text selection on interactive elements */
-  button, [role="button"] {
-    user-select: none;
-  }
+  * { scroll-behavior: auto; }
+  button, [role="button"] { user-select: none; }
+}
+
+/* ─── Scrollbar utilities ─── */
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* ─── Safe area utilities ─── */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ─── Section labels ─── */
+.section-label {
+  text-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-bottom: 8px;
+}
+
+/* ─── Page mount fade ─── */
+.page-enter {
+  animation: fade-in 0.25s var(--ease-smooth) forwards;
 }
