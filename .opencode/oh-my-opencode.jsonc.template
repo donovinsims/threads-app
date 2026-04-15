@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+
+  // Rename this file to `.opencode/oh-my-opencode.jsonc` after you replace the model IDs.
+  // Find exact model IDs with: opencode models
+  // The display names in your UI may be aliases, not valid config IDs.
+
+  "agents": {
+    "prometheus": {
+      // Planning agent
+      "model": "REPLACE_WITH_BIG_PICKLE_MODEL_ID"
+    },
+    "atlas": {
+      // Builder / executor
+      "model": "REPLACE_WITH_BIG_PICKLE_MODEL_ID"
+    },
+    "hephaestus": {
+      // Deep build / complex systems
+      "model": "REPLACE_WITH_BIG_PICKLE_OR_MINIMAX_MODEL_ID"
+    },
+    "sisyphus": {
+      // Hardening / broad cleanup / sweep passes
+      "model": "REPLACE_WITH_NEMOTRON_MODEL_ID"
+    }
+  }
+}
